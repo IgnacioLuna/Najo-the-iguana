@@ -5,13 +5,10 @@ using UnityEngine;
 public class ScarabController : MonoBehaviour
 {
     [SerializeField] private Transform player;
-    [SerializeField] private AudioClip clip;
     [SerializeField] private ScarabData scarabData;
-    [SerializeField] private ParticleSystem earthquake;
     private ScarabPatrol patrol;
     private ScarabChase chase;
-    private ScarabAtack atack;
-    private AudioSource audioSource;
+    private ScarabLookAt lookAt;
     private Animator anim;
     private bool canAtack = false;
     private float timeToAtack;
@@ -21,8 +18,7 @@ public class ScarabController : MonoBehaviour
         anim = GetComponent<Animator>();
         patrol = GetComponent<ScarabPatrol>();
         chase = GetComponent<ScarabChase>();
-        atack = GetComponent<ScarabAtack>();
-        audioSource = GetComponent<AudioSource>();
+        lookAt = GetComponent<ScarabLookAt>();
     }
 
     void Update()
@@ -39,20 +35,13 @@ public class ScarabController : MonoBehaviour
             {
                 if (canAtack)
                 {
-                    atack.Atack();
                     anim.SetTrigger(scarabData.atackType);
-                    if (scarabData.atackType == "HeavyAttack")
-                    {
-                        audioSource.PlayOneShot(clip);
-                        earthquake.Play();
-                    }
-                        
-                    canAtack = false;
                     timeToAtack = 0f;
+                    canAtack = false;
                 }
                 else
-                    atack.LookAtPlayer();
-
+                    lookAt.LookAtPlayer();
+                
                 if (timeToAtack >= scarabData.hitCooldown)
                     canAtack = true;
             }

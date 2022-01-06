@@ -58,7 +58,7 @@ public class ScarabLifeController : MonoBehaviour
                 GetComponent<ScarabController>().enabled = false;
                 GetComponent<ScarabPatrol>().enabled = false;
                 GetComponent<ScarabChase>().enabled = false;
-                GetComponent<ScarabAtack>().enabled = false;
+                GetComponent<ScarabAttack>().enabled = false;
                 this.enabled = false;
                 break;
 

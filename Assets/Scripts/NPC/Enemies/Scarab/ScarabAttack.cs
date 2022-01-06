@@ -2,28 +2,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScarabAtack : MonoBehaviour
+public class ScarabAttack : MonoBehaviour
 {
     [SerializeField] private Transform attackPoint;
-    [SerializeField] private Transform player;
     [SerializeField] private ScarabData scarabData;
     [SerializeField] private LayerMask playerLayer;
-    private float turnSmoothVelocity;
+    [SerializeField] private AudioClip clip;
+    [SerializeField] private ParticleSystem earthquake;
+    private ScarabPatrol patrol;
+    private ScarabChase chase;
+    private ScarabLookAt lookAt;
 
-    public void LookAtPlayer()
+    private AudioSource audioSource;
+
+    private void Start()
     {
-        Vector3 direction = (player.position - transform.position).normalized;
-        float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, scarabData.turnSmoothTime);
-        transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        audioSource = GetComponent<AudioSource>();
+        patrol = GetComponent<ScarabPatrol>();
+        chase = GetComponent<ScarabChase>();
+        lookAt = GetComponent<ScarabLookAt>();
     }
 
-    public void Atack()
+    private void StartAttack()
+    {
+        patrol.enabled = false;
+        chase.enabled = false;
+        lookAt.enabled = false;
+    }
+
+    public void AttackTime()
     {
         Collider[] hitPlayer = Physics.OverlapSphere(attackPoint.position, scarabData.attackRange, playerLayer);
         foreach (Collider player in hitPlayer)
         {
-            Debug.Log("Hit" + player.name);
             if (scarabData.atackType == "SoftAttack")
             {
                 player.GetComponent<IguanaController>().GetDamage(1);
@@ -31,8 +42,17 @@ public class ScarabAtack : MonoBehaviour
             else
             {
                 player.GetComponent<IguanaController>().GetDamage(2);
+                audioSource.PlayOneShot(clip);
+                earthquake.Play();
             }
         }
+    }
+
+    private void FinishAttack()
+    {
+        patrol.enabled = true;
+        chase.enabled = true;
+        lookAt.enabled = true;
     }
 
     private void OnDrawGizmos()
